@@ -6,9 +6,11 @@ import os
 
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    return """
+    return (
+        """
     <!DOCTYPE html>
     <html dir="rtl">
     <head>
@@ -56,7 +58,9 @@ def home():
         <div class="container">
             <h1>🤖 بوت مجتمع المبرمجين</h1>
             <div class="status">✅ البوت يعمل بشكل طبيعي</div>
-            <p>تم التحديث: """ + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """</p>
+            <p>تم التحديث: """
+        + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        + """</p>
             
             <div class="features">
                 <div class="feature">🎮 نظام الألعاب</div>
@@ -70,22 +74,29 @@ def home():
     </body>
     </html>
     """
+    )
 
-@app.route('/status')
+
+@app.route("/status")
 def status():
-    return jsonify({
-        "status": "online",
-        "timestamp": datetime.datetime.now().isoformat(),
-        "service": "Discord Bot - Programmer Community",
-        "version": "2.0.0"
-    })
+    return jsonify(
+        {
+            "status": "online",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "service": "Discord Bot - Programmer Community",
+            "version": "2.0.0",
+        }
+    )
 
-@app.route('/health')
+
+@app.route("/health")
 def health():
     return jsonify({"status": "healthy"}), 200
 
+
 def run():
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host="0.0.0.0", port=8080)
+
 
 def keep_alive():
     server = Thread(target=run)
