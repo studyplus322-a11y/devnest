@@ -961,8 +961,25 @@ async def on_command_error(ctx, error):
 async def daily_backup():
     await backup_data()
 
-if __name__ == "__main__":
-    keep_alive()
+    # تشغيل البوت
+    if __name__ == "__main__":
+        keep_alive()
+        
+        # تشغيل المهام التلقائية
+        daily_backup.start()
+        
+        TOKEN = os.environ.get('DISCORD_TOKEN')
+        if TOKEN:
+            logger.info("🚀 جاري تشغيل البوت المتكامل...")
+            bot.run(TOKEN)
+        else:
+            logger.error("❌ لم يتم العثور على توكن البوت!")
+
+# ✅ يجب أن يكون هذا السطر في بداية السطر بدون مسافات
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("❌ الأمر غير موجود! اكتب `!مساعدة` لرؤية الأوامر المتاحة")
     
     # تشغيل المهام التلقائية
    @bot.event
@@ -999,4 +1016,5 @@ async def on_ready():
     else:
 
         logger.error("❌ لم يتم العثور على توكن البوت!")
+
 
