@@ -171,6 +171,8 @@ class GameView(View):
 @bot.event
 async def on_ready():
     logger.info(f'✅ البوت جاهز: {bot.user.name} ({bot.user.id})')
+    logger.info(f'📊 عدد السيرفرات: {len(bot.guilds)}')
+    logger.info("✅ تم تهيئة جميع الأنظمة")
     
     # تحديث الحالة
     await bot.change_presence(
@@ -180,12 +182,16 @@ async def on_ready():
         )
     )
     
-    # تهيئة قاعدة البيانات
-    init_db()
+    # 🚨 START THE TASK HERE, AFTER THE BOT IS READY 🚨
+    if not daily_backup.is_running():
+        daily_backup.start()
+        logger.info("✅ تم تشغيل مهمة النسخ الاحتياطي اليومي")
     
-    # بدء المهام التلقائية
-    update_status.start()
-    check_temp_bans.start()
+    # Also start the other tasks if they exist
+    if not update_status.is_running():
+        update_status.start()
+    if not check_temp_bans.is_running():
+        check_temp_bans.start()
     
     logger.info("✅ تم تهيئة جميع الأنظمة")
 
@@ -966,4 +972,5 @@ if __name__ == "__main__":
         logger.info("🚀 جاري تشغيل البوت المتكامل...")
         bot.run(TOKEN)
     else:
+
         logger.error("❌ لم يتم العثور على توكن البوت!")
