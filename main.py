@@ -93,23 +93,23 @@ class TicketView(View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(
-        label="🎫 فتح تذكرة", style=discord.ButtonStyle.green, custom_id="open_ticket"
-    )
+    @discord.ui.button(label="🎫 فتح تذكرة",
+                       style=discord.ButtonStyle.green,
+                       custom_id="open_ticket")
     async def open_ticket_button(
         self, interaction: discord.Interaction, button: Button
     ):
         await interaction.response.defer()
 
         # إنشاء تذكرة
-        category = discord.utils.get(interaction.guild.categories, name="🎫 التذاكر")
+        category = discord.utils.get(
+            interaction.guild.categories,
+            name="🎫 التذاكر")
         if not category:
             overwrites = {
                 interaction.guild.default_role: discord.PermissionOverwrite(
-                    read_messages=False
-                ),
-                interaction.guild.me: discord.PermissionOverwrite(read_messages=True),
-            }
+                    read_messages=False), interaction.guild.me: discord.PermissionOverwrite(
+                    read_messages=True), }
             category = await interaction.guild.create_category(
                 "🎫 التذاكر", overwrites=overwrites
             )
@@ -258,8 +258,7 @@ async def on_member_join(member):
         )
 
         embed.set_thumbnail(
-            url=member.avatar.url if member.avatar else member.default_avatar.url
-        )
+            url=member.avatar.url if member.avatar else member.default_avatar.url)
         embed.add_field(name="📚 القواعد", value="اقرأ #📜-القواعد", inline=True)
         embed.add_field(name="💭 التعارف", value="تحدث في #💬-عام", inline=True)
         embed.add_field(name="💡 نصائح", value="شارك معرفتك", inline=True)
@@ -270,7 +269,9 @@ async def on_member_join(member):
         )
 
         view = View()
-        role_button = Button(label="🎭 اختر رتبتك", style=discord.ButtonStyle.blurple)
+        role_button = Button(
+            label="🎭 اختر رتبتك",
+            style=discord.ButtonStyle.blurple)
 
         async def role_callback(interaction):
             role_menu = Select(
@@ -440,9 +441,8 @@ def add_xp(user_id, xp_amount):
             (new_xp, new_level, str(user_id)),
         )
     else:
-        c.execute(
-            "INSERT INTO levels (user_id, xp) VALUES (?, ?)", (str(user_id), xp_amount)
-        )
+        c.execute("INSERT INTO levels (user_id, xp) VALUES (?, ?)",
+                  (str(user_id), xp_amount))
         new_level = 1
 
     conn.commit()
@@ -456,7 +456,10 @@ def add_warning(user_id, moderator_id, reason):
 
     c.execute(
         "INSERT INTO warnings (user_id, moderator_id, reason, timestamp) VALUES (?, ?, ?, ?)",
-        (str(user_id), str(moderator_id), reason, datetime.datetime.now()),
+        (str(user_id),
+         str(moderator_id),
+         reason,
+         datetime.datetime.now()),
     )
 
     # حساب عدد التحذيرات
@@ -504,8 +507,9 @@ async def help_command(ctx):
     )
 
     embed.add_field(
-        name="🛠️ **نظام التذاكر**", value="```!تذكرة !لوحة_التذاكر```", inline=False
-    )
+        name="🛠️ **نظام التذاكر**",
+        value="```!تذكرة !لوحة_التذاكر```",
+        inline=False)
 
     embed.add_field(
         name="⚙️ **إعدادات السيرفر**",
@@ -518,14 +522,17 @@ async def help_command(ctx):
     view = View()
     buttons = [
         Button(
-            label="الإدارة", style=discord.ButtonStyle.green, custom_id="help_admin"
-        ),
+            label="الإدارة",
+            style=discord.ButtonStyle.green,
+            custom_id="help_admin"),
         Button(
-            label="الألعاب", style=discord.ButtonStyle.blurple, custom_id="help_games"
-        ),
+            label="الألعاب",
+            style=discord.ButtonStyle.blurple,
+            custom_id="help_games"),
         Button(
-            label="التخصيص", style=discord.ButtonStyle.gray, custom_id="help_custom"
-        ),
+            label="التخصيص",
+            style=discord.ButtonStyle.gray,
+            custom_id="help_custom"),
     ]
 
     for button in buttons:
@@ -547,12 +554,16 @@ async def warn(ctx, member: discord.Member, *, reason="بدون سبب"):
     embed.add_field(name="المستخدم", value=member.mention, inline=True)
     embed.add_field(name="المشرف", value=ctx.author.mention, inline=True)
     embed.add_field(name="السبب", value=reason, inline=False)
-    embed.add_field(name="عدد التحذيرات", value=f"{warning_count}/5", inline=True)
+    embed.add_field(
+        name="عدد التحذيرات",
+        value=f"{warning_count}/5",
+        inline=True)
 
     if warning_count >= 5:
         embed.add_field(
-            name="🚨 إجراء تلقائي", value="تم حظر المستخدم تلقائياً", inline=False
-        )
+            name="🚨 إجراء تلقائي",
+            value="تم حظر المستخدم تلقائياً",
+            inline=False)
         await member.ban(reason="تجاوز الحد الأقصى للتحذيرات")
 
     await ctx.send(embed=embed)
@@ -619,8 +630,9 @@ async def ban_command(
             embed.add_field(name="المدة", value=duration, inline=True)
             embed.add_field(name="السبب", value=reason, inline=False)
             embed.add_field(
-                name="ينتهي في", value=end_time.strftime("%Y-%m-%d %H:%M"), inline=True
-            )
+                name="ينتهي في",
+                value=end_time.strftime("%Y-%m-%d %H:%M"),
+                inline=True)
 
             await member.ban(reason=f"مؤقت: {reason} | المدة: {duration}")
         else:
@@ -640,7 +652,12 @@ async def ban_command(
 
 @bot.command(name="تايم")
 @commands.has_permissions(manage_roles=True)
-async def timeout(ctx, member: discord.Member, duration: str, *, reason="بدون سبب"):
+async def timeout(
+        ctx,
+        member: discord.Member,
+        duration: str,
+        *,
+        reason="بدون سبب"):
     time_units = {"s": 1, "m": 60, "h": 3600, "d": 86400}
     unit = duration[-1]
 
@@ -711,7 +728,7 @@ async def role_info(ctx, *, role_name: str = None):
         )
 
         # تقسيم الرتب إلى مجموعات
-        chunks = [roles[i : i + 10] for i in range(0, len(roles), 10)]
+        chunks = [roles[i: i + 10] for i in range(0, len(roles), 10)]
 
         for i, chunk in enumerate(chunks[:3]):  # عرض 3 صفحات كحد أقصى
             role_list = "\n".join(
@@ -728,10 +745,14 @@ async def role_info(ctx, *, role_name: str = None):
     else:
         role = discord.utils.get(ctx.guild.roles, name=role_name)
         if role:
-            embed = discord.Embed(title=f"معلومات رتبة: {role.name}", color=role.color)
+            embed = discord.Embed(
+                title=f"معلومات رتبة: {
+                    role.name}", color=role.color)
             embed.add_field(name="🆔 الرقم", value=role.id, inline=True)
             embed.add_field(name="🎨 اللون", value=str(role.color), inline=True)
-            embed.add_field(name="👥 عدد الأعضاء", value=len(role.members), inline=True)
+            embed.add_field(
+                name="👥 عدد الأعضاء", value=len(
+                    role.members), inline=True)
             embed.add_field(
                 name="📅 تاريخ الإنشاء",
                 value=role.created_at.strftime("%Y-%m-%d"),
@@ -784,8 +805,9 @@ async def add_role(ctx, member: discord.Member, *, role_name: str):
 @bot.command(name="لعبة")
 async def games_menu(ctx):
     embed = discord.Embed(
-        title="🎮 مركز الألعاب", description="**اختر لعبة للعب:**", color=COLORS["GOLD"]
-    )
+        title="🎮 مركز الألعاب",
+        description="**اختر لعبة للعب:**",
+        color=COLORS["GOLD"])
 
     games = [
         {"name": "🎮 حجر ورقة مقص", "desc": "!حجر_ورقة_مقص"},
@@ -803,11 +825,18 @@ async def games_menu(ctx):
 
     # أزرار الألعاب
     game_buttons = [
-        Button(label="✊✋✌️", style=discord.ButtonStyle.green, custom_id="play_rps"),
         Button(
-            label="🎲", style=discord.ButtonStyle.blurple, custom_id="play_roulette"
-        ),
-        Button(label="❓", style=discord.ButtonStyle.gray, custom_id="play_quiz"),
+            label="✊✋✌️",
+            style=discord.ButtonStyle.green,
+            custom_id="play_rps"),
+        Button(
+            label="🎲",
+            style=discord.ButtonStyle.blurple,
+            custom_id="play_roulette"),
+        Button(
+            label="❓",
+            style=discord.ButtonStyle.gray,
+            custom_id="play_quiz"),
     ]
 
     for button in game_buttons:
@@ -819,8 +848,9 @@ async def games_menu(ctx):
 @bot.command(name="حجر_ورقة_مقص")
 async def rps(ctx):
     embed = discord.Embed(
-        title="🎮 حجر ورقة مقص", description="**اختر حركتك:**", color=COLORS["GOLD"]
-    )
+        title="🎮 حجر ورقة مقص",
+        description="**اختر حركتك:**",
+        color=COLORS["GOLD"])
 
     await ctx.send(embed=embed, view=GameView("rps"))
 
@@ -918,26 +948,36 @@ async def my_level(ctx, member: discord.Member = None):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
-    c.execute("SELECT xp, level FROM levels WHERE user_id = ?", (str(member.id),))
+    c.execute("SELECT xp, level FROM levels WHERE user_id = ?",
+              (str(member.id),))
     result = c.fetchone()
 
     if result:
         xp, level = result
         needed_xp = 100 * (level**2)
 
-        embed = discord.Embed(title=f"📊 مستوى {member.name}", color=member.color)
+        embed = discord.Embed(
+            title=f"📊 مستوى {
+                member.name}",
+            color=member.color)
 
         embed.add_field(name="📈 المستوى", value=f"**{level}**", inline=True)
-        embed.add_field(name="⚡ النقاط", value=f"**{xp}/{needed_xp}**", inline=True)
         embed.add_field(
-            name="🏆 التقدم", value=f"{int((xp / needed_xp) * 100)}%", inline=True
-        )
+            name="⚡ النقاط",
+            value=f"**{xp}/{needed_xp}**",
+            inline=True)
+        embed.add_field(name="🏆 التقدم",
+                        value=f"{int((xp / needed_xp) * 100)}%",
+                        inline=True)
 
         # شريط التقدم
         progress_bar = "█" * int((xp / needed_xp) * 20) + "░" * (
             20 - int((xp / needed_xp) * 20)
         )
-        embed.add_field(name="📊 شريط التقدم", value=f"`{progress_bar}`", inline=False)
+        embed.add_field(
+            name="📊 شريط التقدم",
+            value=f"`{progress_bar}`",
+            inline=False)
 
         # الرتبة في السيرفر
         rank_query = """
@@ -951,8 +991,7 @@ async def my_level(ctx, member: discord.Member = None):
         conn.close()
 
         embed.set_thumbnail(
-            url=member.avatar.url if member.avatar else member.default_avatar.url
-        )
+            url=member.avatar.url if member.avatar else member.default_avatar.url)
         await ctx.send(embed=embed)
     else:
         await ctx.send("❌ لم يتم العثور على بيانات المستخدم")
@@ -1007,7 +1046,10 @@ async def ticket_panel(ctx):
         value="1. اختر نوع المشكلة\n2. انتظر رد المسؤول\n3. قدم التفاصيل اللازمة",
         inline=False,
     )
-    embed.add_field(name="⏱️ وقت الاستجابة", value="24 ساعة كحد أقصى", inline=True)
+    embed.add_field(
+        name="⏱️ وقت الاستجابة",
+        value="24 ساعة كحد أقصى",
+        inline=True)
     embed.add_field(name="📞 الدعم", value="@المسؤولين", inline=True)
 
     await ctx.send(embed=embed, view=TicketView())
@@ -1022,8 +1064,15 @@ async def server_settings(ctx):
     embed = discord.Embed(title="⚙️ إعدادات السيرفر", color=COLORS["PURPLE"])
 
     # إحصائيات السيرفر
-    embed.add_field(name="👥 الأعضاء", value=ctx.guild.member_count, inline=True)
-    embed.add_field(name="📁 القنوات", value=len(ctx.guild.channels), inline=True)
+    embed.add_field(
+        name="👥 الأعضاء",
+        value=ctx.guild.member_count,
+        inline=True)
+    embed.add_field(
+        name="📁 القنوات",
+        value=len(
+            ctx.guild.channels),
+        inline=True)
     embed.add_field(name="🎭 الرتب", value=len(ctx.guild.roles), inline=True)
 
     # إعدادات النظام
@@ -1073,14 +1122,23 @@ async def on_message_delete(message):
     if message.author.bot:
         return
 
-    log_channel = discord.utils.get(message.guild.text_channels, name="📜-السجل")
+    log_channel = discord.utils.get(
+        message.guild.text_channels, name="📜-السجل")
     if log_channel:
         embed = discord.Embed(title="🗑️ حذف رسالة", color=COLORS["WARNING"])
-        embed.add_field(name="المستخدم", value=message.author.mention, inline=True)
-        embed.add_field(name="القناة", value=message.channel.mention, inline=True)
+        embed.add_field(
+            name="المستخدم",
+            value=message.author.mention,
+            inline=True)
+        embed.add_field(
+            name="القناة",
+            value=message.channel.mention,
+            inline=True)
 
         if message.content:
-            embed.add_field(name="المحتوى", value=message.content[:1024], inline=False)
+            embed.add_field(name="المحتوى",
+                            value=message.content[:1024],
+                            inline=False)
 
         embed.set_footer(text=f"ID: {message.id}")
         await log_channel.send(embed=embed)
@@ -1094,11 +1152,17 @@ async def on_message_edit(before, after):
     log_channel = discord.utils.get(before.guild.text_channels, name="📜-السجل")
     if log_channel:
         embed = discord.Embed(title="✏️ تعديل رسالة", color=COLORS["INFO"])
-        embed.add_field(name="المستخدم", value=before.author.mention, inline=True)
-        embed.add_field(name="القناة", value=before.channel.mention, inline=True)
         embed.add_field(
-            name="قبل", value=before.content[:500] or "لا يوجد نص", inline=False
-        )
+            name="المستخدم",
+            value=before.author.mention,
+            inline=True)
+        embed.add_field(
+            name="القناة",
+            value=before.channel.mention,
+            inline=True)
+        embed.add_field(name="قبل",
+                        value=before.content[:500] or "لا يوجد نص",
+                        inline=False)
         embed.add_field(
             name="بعد", value=after.content[:500] or "لا يوجد نص", inline=False
         )
@@ -1171,3 +1235,4 @@ if __name__ == "__main__":
         bot.run(TOKEN)
     else:
         logger.error("❌ لم يتم العثور على توكن البوت!")
+
