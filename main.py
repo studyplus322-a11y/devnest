@@ -965,7 +965,32 @@ if __name__ == "__main__":
     keep_alive()
     
     # تشغيل المهام التلقائية
-    daily_backup.start()
+   @bot.event
+async def on_ready():
+    logger.info(f'✅ البوت جاهز: {bot.user.name} ({bot.user.id})')
+    logger.info(f'📊 عدد السيرفرات: {len(bot.guilds)}')
+    logger.info("✅ تم تهيئة جميع الأنظمة")
+    
+    # تحديث الحالة
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.playing,
+            name=f"في {len(bot.guilds)} سيرفر | !مساعدة"
+        )
+    )
+    
+    # 🚀 بدء جميع المهام التلقائية هنا
+    if not update_status.is_running():
+        update_status.start()
+        logger.info("✅ تم تشغيل مهمة تحديث الحالة")
+    
+    if not check_temp_bans.is_running():
+        check_temp_bans.start()
+        logger.info("✅ تم تشغيل مهمة التحقق من البان المؤقت")
+    
+    if not daily_backup.is_running():
+        daily_backup.start()
+        logger.info("✅ تم تشغيل مهمة النسخ الاحتياطي اليومي")
     
     TOKEN = os.environ.get('DISCORD_TOKEN')
     if TOKEN:
@@ -974,3 +999,4 @@ if __name__ == "__main__":
     else:
 
         logger.error("❌ لم يتم العثور على توكن البوت!")
+
